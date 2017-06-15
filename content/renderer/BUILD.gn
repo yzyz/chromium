@@ -280,6 +280,8 @@ target(link_target_type, "renderer") {
     "mojo_main_runner.h",
     "mouse_lock_dispatcher.cc",
     "mouse_lock_dispatcher.h",
+    "mus_plugin/mus_plugin.cc",
+    "mus_plugin/mus_plugin.h",
     "navigation_state_impl.cc",
     "navigation_state_impl.h",
     "net_info_helper.cc",
