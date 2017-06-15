@@ -130,6 +130,7 @@
 #include "content/renderer/mojo/blink_interface_registry_impl.h"
 #include "content/renderer/mojo/interface_provider_js_wrapper.h"
 #include "content/renderer/mojo_bindings_controller.h"
+#include "content/renderer/mus_plugin/mus_plugin.h"
 #include "content/renderer/navigation_state_impl.h"
 #include "content/renderer/pepper/pepper_audio_controller.h"
 #include "content/renderer/pepper/plugin_instance_throttler_impl.h"
@@ -2842,6 +2843,11 @@ blink::WebPlugin* RenderFrameImpl::CreatePlugin(
   if (GetContentClient()->renderer()->OverrideCreatePlugin(this, params,
                                                            &plugin)) {
     return plugin;
+  }
+
+  if (params.mime_type.ContainsOnlyASCII() &&
+      params.mime_type.Ascii() == kMusPluginMimeType) {
+    return new MusPlugin();
   }
 
   if (params.mime_type.ContainsOnlyASCII() &&
