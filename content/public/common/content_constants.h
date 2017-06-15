@@ -23,6 +23,7 @@ CONTENT_EXPORT extern const base::FilePath::CharType kPepperDataDirname[];
 
 // The MIME type used for the browser plugin.
 CONTENT_EXPORT extern const char kBrowserPluginMimeType[];
+CONTENT_EXPORT extern const char kMusPluginMimeType[];
 
 CONTENT_EXPORT extern const char kFlashPluginName[];
 CONTENT_EXPORT extern const char kFlashPluginSwfMimeType[];

@@ -12,6 +12,7 @@ const base::FilePath::CharType kPepperDataDirname[] =
     FILE_PATH_LITERAL("Pepper Data");
 
 const char kBrowserPluginMimeType[] = "application/browser-plugin";
+const char kMusPluginMimeType[] = "application/mus";
 
 const char kFlashPluginName[] = "Shockwave Flash";
 const char kFlashPluginSwfMimeType[] = "application/x-shockwave-flash";
