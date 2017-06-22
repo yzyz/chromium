@@ -631,7 +631,8 @@ void BrowserCommandController::ExecuteCommandWithDisposition(
         mash::mojom::LaunchablePtr launchable;
         connector->BindInterface("touch_hud", &launchable);
         launchable->Launch(mash::mojom::kWindow,
-                           mash::mojom::LaunchMode::DEFAULT);
+                           mash::mojom::LaunchMode::DEFAULT,
+                           nullptr);
       } else {
         ash::accelerators::ToggleTouchHudProjection();
       }

@@ -39,7 +39,8 @@ class TaskViewer : public service_manager::Service,
                        mojo::ScopedMessagePipeHandle interface_pipe) override;
 
   // ::mash::mojom::Launchable:
-  void Launch(uint32_t what, ::mash::mojom::LaunchMode how) override;
+  void Launch(uint32_t what, ::mash::mojom::LaunchMode how,
+              ui::mojom::WindowTreeClientRequest request) override;
 
   void Create(const service_manager::BindSourceInfo& source_info,
               ::mash::mojom::LaunchableRequest request);
