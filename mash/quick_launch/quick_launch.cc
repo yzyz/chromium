@@ -139,7 +139,8 @@ class QuickLaunchUI : public views::WidgetDelegateView,
     connector_->BindInterface(name, &launchable);
     launchable->Launch(mojom::kWindow,
                        new_window ? mojom::LaunchMode::MAKE_NEW
-                                  : mojom::LaunchMode::REUSE);
+                                  : mojom::LaunchMode::REUSE,
+                       nullptr);
   }
 
   QuickLaunch* quick_launch_;
@@ -183,7 +184,7 @@ void QuickLaunch::OnStart() {
     return;
   }
 
-  Launch(mojom::kWindow, mojom::LaunchMode::MAKE_NEW);
+  Launch(mojom::kWindow, mojom::LaunchMode::MAKE_NEW, nullptr);
 }
 
 void QuickLaunch::OnBindInterface(
@@ -194,7 +195,8 @@ void QuickLaunch::OnBindInterface(
                           std::move(interface_pipe));
 }
 
-void QuickLaunch::Launch(uint32_t what, mojom::LaunchMode how) {
+void QuickLaunch::Launch(uint32_t what, mojom::LaunchMode how,
+                         ui::mojom::WindowTreeClientRequest request) {
   bool reuse = how == mojom::LaunchMode::REUSE ||
                how == mojom::LaunchMode::DEFAULT;
   if (reuse && !windows_.empty()) {

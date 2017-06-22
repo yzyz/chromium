@@ -82,7 +82,8 @@ void TouchHudApplication::OnBindInterface(
                           std::move(interface_pipe));
 }
 
-void TouchHudApplication::Launch(uint32_t what, mash::mojom::LaunchMode how) {
+void TouchHudApplication::Launch(uint32_t what, mash::mojom::LaunchMode how,
+                                 ui::mojom::WindowTreeClientRequest request) {
   if (!widget_) {
     widget_ = new views::Widget;
     views::Widget::InitParams params(

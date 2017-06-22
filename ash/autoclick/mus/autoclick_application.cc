@@ -105,7 +105,8 @@ void AutoclickApplication::OnBindInterface(
                           std::move(interface_pipe));
 }
 
-void AutoclickApplication::Launch(uint32_t what, mash::mojom::LaunchMode how) {
+void AutoclickApplication::Launch(uint32_t what, mash::mojom::LaunchMode how,
+                                  ui::mojom::WindowTreeClientRequest request) {
   if (!widget_) {
     widget_.reset(new views::Widget);
     views::Widget::InitParams params(

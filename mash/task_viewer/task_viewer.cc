@@ -307,7 +307,8 @@ void TaskViewer::OnBindInterface(
                           std::move(interface_pipe));
 }
 
-void TaskViewer::Launch(uint32_t what, mojom::LaunchMode how) {
+void TaskViewer::Launch(uint32_t what, mojom::LaunchMode how,
+                        ui::mojom::WindowTreeClientRequest request) {
   bool reuse = how == mojom::LaunchMode::REUSE ||
                how == mojom::LaunchMode::DEFAULT;
   if (reuse && !windows_.empty()) {

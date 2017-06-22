@@ -136,7 +136,8 @@ void AcceleratorControllerDelegateMus::PerformAction(
       mash::mojom::LaunchablePtr launchable;
       window_manager_->connector()->BindInterface("touch_hud", &launchable);
       launchable->Launch(mash::mojom::kWindow,
-                         mash::mojom::LaunchMode::DEFAULT);
+                         mash::mojom::LaunchMode::DEFAULT,
+                         nullptr);
       break;
     }
     default:

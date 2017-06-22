@@ -719,7 +719,8 @@ void AccessibilityManager::UpdateAutoclickFromPref() {
         content::ServiceManagerConnection::GetForProcess()->GetConnector();
     mash::mojom::LaunchablePtr launchable;
     connector->BindInterface("accessibility_autoclick", &launchable);
-    launchable->Launch(mash::mojom::kWindow, mash::mojom::LaunchMode::DEFAULT);
+    launchable->Launch(mash::mojom::kWindow, mash::mojom::LaunchMode::DEFAULT,
+                       nullptr);
     return;
   }
 
