@@ -236,7 +236,8 @@ void CatalogViewer::OnBindInterface(
   registry_.BindInterface(interface_name, std::move(interface_pipe));
 }
 
-void CatalogViewer::Launch(uint32_t what, mojom::LaunchMode how) {
+void CatalogViewer::Launch(uint32_t what, mojom::LaunchMode how,
+                           ui::mojom::WindowTreeClientRequest request) {
   bool reuse = how == mojom::LaunchMode::REUSE ||
                how == mojom::LaunchMode::DEFAULT;
   if (reuse && !windows_.empty()) {
