@@ -96,6 +96,7 @@
 #include "content/browser/memory/memory_coordinator_impl.h"
 #include "content/browser/mime_registry_impl.h"
 #include "content/browser/net/reporting_service_proxy.h"
+#include "content/browser/mus_plugin/mus_plugin_window_tree_client_factory.h"
 #include "content/browser/notifications/notification_message_filter.h"
 #include "content/browser/notifications/platform_notification_context_impl.h"
 #include "content/browser/payments/payment_manager.h"
@@ -139,6 +140,7 @@
 #include "content/common/content_switches_internal.h"
 #include "content/common/frame_messages.h"
 #include "content/common/in_process_child_thread_params.h"
+#include "content/common/mus_plugin_window_tree_client_factory.mojom.h"
 #include "content/common/render_process_messages.h"
 #include "content/common/resource_messages.h"
 #include "content/common/service_manager/child_connection.h"
@@ -687,6 +689,13 @@ void CreateResourceCoordinatorProcessInterface(
     resource_coordinator::mojom::CoordinationUnitRequest request) {
   render_process_host->GetProcessResourceCoordinator()->service()->AddBinding(
       std::move(request));
+}
+
+void CreateMusPluginWindowTreeClientFactory(
+    int render_process_id,
+    const service_manager::BindSourceInfo& source_info,
+    mojom::MusPluginWindowTreeClientFactoryRequest request) {
+  MusPluginWindowTreeClientFactoryImpl::CreateNewFactory(std::move(request));
 }
 
 // Forwards service requests to Service Manager since the renderer cannot launch
@@ -1833,6 +1842,9 @@ void RenderProcessHostImpl::RegisterMojoInterfaces() {
     AddUIThreadInterface(
         registry.get(), base::Bind(&CreateMemoryCoordinatorHandle, GetID()));
   }
+  AddUIThreadInterface(
+      registry.get(),
+      base::Bind(&CreateMusPluginWindowTreeClientFactory, GetID()));
 
   registry->AddInterface(
       base::Bind(&MimeRegistryImpl::Create),

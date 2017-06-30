@@ -47,6 +47,8 @@ class RendererWindowTreeClient : public ui::mojom::WindowTreeClient {
       gpu::GpuMemoryBufferManager* gpu_memory_buffer_manager,
       const LayerTreeFrameSinkCallback& callback);
 
+  ui::mojom::WindowTree* GetWindowTree();
+
  private:
   explicit RendererWindowTreeClient(int routing_id);
   ~RendererWindowTreeClient() override;
