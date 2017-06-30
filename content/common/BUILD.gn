@@ -615,6 +615,7 @@ mojom("mojo_bindings") {
     "media/renderer_audio_output_stream_factory.mojom",
     "memory_coordinator.mojom",
     "mutable_network_traffic_annotation_tag.mojom",
+    "mus_plugin_window_tree_client_factory.mojom",
     "native_types.mojom",
     "network_service.mojom",
     "push_messaging.mojom",

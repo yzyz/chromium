@@ -65,6 +65,10 @@ void RendererWindowTreeClient::RequestLayerTreeFrameSink(
   pending_layer_tree_frame_sink_callback_ = callback;
 }
 
+ui::mojom::WindowTree* RendererWindowTreeClient::GetWindowTree() {
+  return tree_.get();
+}
+
 RendererWindowTreeClient::RendererWindowTreeClient(int routing_id)
     : routing_id_(routing_id), binding_(this) {
 }

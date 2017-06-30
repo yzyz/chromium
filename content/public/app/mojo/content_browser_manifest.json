@@ -29,6 +29,7 @@
           "content::mojom::FieldTrialRecorder",
           "content::mojom::FrameSinkProvider",
           "content::mojom::MemoryCoordinatorHandle",
+          "content::mojom::MusPluginWindowTreeClientFactory",
           "content::mojom::PushMessaging",
           "content::mojom::RendererHost",
           "content::mojom::ServiceWorkerDispatcherHost",
