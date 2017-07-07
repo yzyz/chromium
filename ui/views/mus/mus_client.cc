@@ -68,7 +68,8 @@ MusClient::MusClient(service_manager::Connector* connector,
                      const service_manager::Identity& identity,
                      scoped_refptr<base::SingleThreadTaskRunner> io_task_runner,
                      bool create_wm_state,
-                     MusClientTestingState testing_state)
+                     MusClientTestingState testing_state,
+                     ui::mojom::WindowTreeClientRequest request)
     : identity_(identity) {
   DCHECK(!instance_);
   DCHECK(aura::Env::GetInstance());
@@ -105,11 +106,13 @@ MusClient::MusClient(service_manager::Connector* connector,
   if (testing_state == MusClientTestingState::CREATE_TESTING_STATE)
     connector->BindInterface(ui::mojom::kServiceName, &server_test_ptr_);
 
+  bool valid_request = request.is_pending();
   window_tree_client_ = base::MakeUnique<aura::WindowTreeClient>(
       connector, this, nullptr /* window_manager_delegate */,
-      nullptr /* window_tree_client_request */, std::move(io_task_runner));
+      std::move(request), std::move(io_task_runner));
   aura::Env::GetInstance()->SetWindowTreeClient(window_tree_client_.get());
-  window_tree_client_->ConnectViaWindowTreeFactory();
+  if (!valid_request)
+    window_tree_client_->ConnectViaWindowTreeFactory();
 
   pointer_watcher_event_router_ =
       base::MakeUnique<PointerWatcherEventRouter>(window_tree_client_.get());
@@ -290,7 +293,8 @@ std::unique_ptr<DesktopWindowTreeHost> MusClient::CreateDesktopWindowTreeHost(
 
 void MusClient::OnEmbed(
     std::unique_ptr<aura::WindowTreeHostMus> window_tree_host) {
-  NOTREACHED();
+  // can be reached now through mus plugin
+  // NOTREACHED();
 }
 
 void MusClient::OnLostConnection(aura::WindowTreeClient* client) {}

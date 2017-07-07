@@ -74,7 +74,8 @@ class VIEWS_MUS_EXPORT MusClient : public aura::WindowTreeClientDelegate,
       const service_manager::Identity& identity,
       scoped_refptr<base::SingleThreadTaskRunner> io_task_runner = nullptr,
       bool create_wm_state = true,
-      MusClientTestingState testing_state = MusClientTestingState::NO_TESTING);
+      MusClientTestingState testing_state = MusClientTestingState::NO_TESTING,
+      ui::mojom::WindowTreeClientRequest request = nullptr);
   ~MusClient() override;
 
   static MusClient* Get() { return instance_; }
