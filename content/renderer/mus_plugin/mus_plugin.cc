@@ -1,6 +1,7 @@
 #include "content/renderer/mus_plugin/mus_plugin.h"
 
 #include "base/bind.h"
+#include "cc/surfaces/local_surface_id_allocator.h"
 #include "content/renderer/mus/renderer_window_tree_client.h"
 #include "content/renderer/render_frame_impl.h"
 #include "content/renderer/render_widget.h"
@@ -42,6 +43,10 @@ bool MusPlugin::Initialize(blink::WebPluginContainer* container) {
   }
 
   tree->NewWindow(20, 17, base::nullopt);
+  tree->AddWindow(21, client->root_window_id(), 17);
+  cc::LocalSurfaceIdAllocator allocator;
+  tree->SetWindowBounds(22, 17, gfx::Rect(10, 20, 0, 0), allocator.GenerateId());
+  tree->SetWindowVisibility(23, 17, true);
 
   mojom::MusPluginWindowTreeClientFactoryPtr factory;
   ChildThread::Get()->GetConnector()->BindInterface(

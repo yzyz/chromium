@@ -69,6 +69,10 @@ ui::mojom::WindowTree* RendererWindowTreeClient::GetWindowTree() {
   return tree_.get();
 }
 
+ui::Id RendererWindowTreeClient::root_window_id() {
+  return root_window_id_;
+}
+
 RendererWindowTreeClient::RendererWindowTreeClient(int routing_id)
     : routing_id_(routing_id), binding_(this) {
 }

@@ -14,6 +14,7 @@
 #include "services/catalog/public/cpp/resource_loader.h"
 #include "services/catalog/public/interfaces/constants.mojom.h"
 #include "services/service_manager/public/cpp/connector.h"
+#include "services/ui/public/interfaces/window_tree.mojom.h"
 #include "ui/aura/env.h"
 #include "ui/base/ime/input_method_initializer.h"
 #include "ui/base/material_design/material_design_controller.h"
@@ -76,10 +77,11 @@ std::unique_ptr<AuraInit> AuraInit::Create(
     const std::string& resource_file,
     const std::string& resource_file_200,
     scoped_refptr<base::SingleThreadTaskRunner> io_task_runner,
-    Mode mode) {
+    Mode mode,
+    ui::mojom::WindowTreeClientRequest request) {
   std::unique_ptr<AuraInit> aura_init = base::WrapUnique(new AuraInit());
   if (!aura_init->Init(connector, identity, resource_file, resource_file_200,
-                       io_task_runner, mode)) {
+                       io_task_runner, mode, std::move(request))) {
     aura_init.reset();
   }
   return aura_init;
@@ -90,7 +92,8 @@ bool AuraInit::Init(service_manager::Connector* connector,
                     const std::string& resource_file,
                     const std::string& resource_file_200,
                     scoped_refptr<base::SingleThreadTaskRunner> io_task_runner,
-                    Mode mode) {
+                    Mode mode,
+                    ui::mojom::WindowTreeClientRequest request) {
   env_ = aura::Env::CreateInstance(
       (mode == Mode::AURA_MUS || mode == Mode::AURA_MUS_WINDOW_MANAGER)
           ? aura::Env::Mode::MUS
@@ -98,7 +101,10 @@ bool AuraInit::Init(service_manager::Connector* connector,
 
   if (mode == Mode::AURA_MUS) {
     mus_client_ =
-        base::WrapUnique(new MusClient(connector, identity, io_task_runner));
+        base::WrapUnique(new MusClient(connector, identity, io_task_runner,
+                                       true /* create_wm_state */,
+                                       MusClientTestingState::NO_TESTING,
+                                       std::move(request)));
   }
   ui::MaterialDesignController::Initialize();
   if (!InitializeResources(connector, resource_file, resource_file_200))

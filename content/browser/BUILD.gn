@@ -88,6 +88,8 @@ source_set("browser") {
     "//gpu/command_buffer/client:gles2_interface",
     "//gpu/ipc/host",
     "//gpu/vulkan:features",
+    "//mash/public/interfaces",
+    "//mash/quick_launch/public/interfaces",
     "//media",
     "//media/capture",
     "//media/capture/mojo:image_capture",
