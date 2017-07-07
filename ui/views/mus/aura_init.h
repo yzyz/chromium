@@ -10,6 +10,7 @@
 
 #include "base/macros.h"
 #include "build/build_config.h"
+#include "services/ui/public/interfaces/window_tree.mojom.h"
 #include "third_party/skia/include/core/SkRefCnt.h"
 #include "ui/aura/env.h"
 #include "ui/views/mus/mus_export.h"
@@ -59,7 +60,8 @@ class VIEWS_MUS_EXPORT AuraInit {
            const std::string& resource_file,
            const std::string& resource_file_200 = std::string(),
            scoped_refptr<base::SingleThreadTaskRunner> io_task_runner = nullptr,
-           Mode mode = Mode::UI);
+           Mode mode = Mode::UI,
+           ui::mojom::WindowTreeClientRequest request = nullptr);
   ~AuraInit();
 
   // Only valid if Mode::AURA_MUS was passed to constructor.

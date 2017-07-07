@@ -3,7 +3,10 @@
   "display_name": "Quick Launch Bar",
   "interface_provider_specs": {
     "service_manager:connector": {
-      "provides": { "mash:launchable": [ "mash::mojom::Launchable" ] },
+      "provides": {
+	"app": [ "mash::mojom::Launchable" ],
+        "mash:launchable": [ "mash::mojom::Launchable" ]
+      },
       "requires": {
         "*": [ "app", "mash:launchable" ],
         "catalog": [ "catalog:catalog" ]

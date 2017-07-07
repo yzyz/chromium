@@ -11,6 +11,7 @@
 #include "base/strings/string16.h"
 #include "base/strings/string_util.h"
 #include "base/strings/utf_string_conversions.h"
+#include "base/threading/thread_task_runner_handle.h"
 #include "mash/public/interfaces/launchable.mojom.h"
 #include "services/catalog/public/interfaces/catalog.mojom.h"
 #include "services/catalog/public/interfaces/constants.mojom.h"
@@ -19,12 +20,14 @@
 #include "services/service_manager/public/cpp/service.h"
 #include "services/service_manager/public/cpp/service_context.h"
 #include "services/service_manager/public/cpp/service_runner.h"
+#include "ui/aura/mus/window_tree_client.h"
 #include "ui/aura/window.h"
 #include "ui/aura/window_tree_host.h"
 #include "ui/views/background.h"
 #include "ui/views/controls/textfield/textfield.h"
 #include "ui/views/controls/textfield/textfield_controller.h"
 #include "ui/views/mus/aura_init.h"
+#include "ui/views/mus/mus_client.h"
 #include "ui/views/widget/widget.h"
 #include "ui/views/widget/widget_delegate.h"
 #include "url/gurl.h"
@@ -172,6 +175,7 @@ void QuickLaunch::RemoveWindow(views::Widget* window) {
 }
 
 void QuickLaunch::OnStart() {
+  /*
   aura_init_ = base::MakeUnique<views::AuraInit>(
       context()->connector(), context()->identity(), "views_mus_resources.pak",
       std::string(), nullptr, views::AuraInit::Mode::AURA_MUS);
@@ -185,6 +189,7 @@ void QuickLaunch::OnStart() {
   }
 
   Launch(mojom::kWindow, mojom::LaunchMode::MAKE_NEW, nullptr);
+  */
 }
 
 void QuickLaunch::OnBindInterface(
@@ -197,6 +202,13 @@ void QuickLaunch::OnBindInterface(
 
 void QuickLaunch::Launch(uint32_t what, mojom::LaunchMode how,
                          ui::mojom::WindowTreeClientRequest request) {
+  if (!aura_init_) {
+    aura_init_ = base::MakeUnique<views::AuraInit>(
+        context()->connector(), context()->identity(),
+        "views_mus_resources.pak", std::string(), nullptr,
+        views::AuraInit::Mode::AURA_MUS, std::move(request));
+  }
+
   bool reuse = how == mojom::LaunchMode::REUSE ||
                how == mojom::LaunchMode::DEFAULT;
   if (reuse && !windows_.empty()) {
@@ -206,12 +218,18 @@ void QuickLaunch::Launch(uint32_t what, mojom::LaunchMode how,
   catalog::mojom::CatalogPtr catalog;
   context()->connector()->BindInterface(catalog::mojom::kServiceName, &catalog);
 
-  views::Widget* window = views::Widget::CreateWindowWithContextAndBounds(
-      new QuickLaunchUI(this, context()->connector(), std::move(catalog)),
-      nullptr, gfx::Rect(10, 640, 0, 0));
-  window->GetNativeWindow()->GetHost()->window()->SetName("QuickLaunch");
-  window->Show();
-  windows_.push_back(window);
+  QuickLaunchUI* quick_launch_ui =
+      new QuickLaunchUI(this, context()->connector(), std::move(catalog));
+  // hack to ensure WindowTreeClient::OnEmbed() gets called first and
+  // initializes the WindowTree that we need to create a window
+  base::ThreadTaskRunnerHandle::Get()->PostDelayedTask(
+      FROM_HERE, base::Bind([](QuickLaunchUI* quick_launch_ui) {
+        views::Widget* window = views::Widget::CreateWindowWithContextAndBounds(
+            quick_launch_ui, nullptr, gfx::Rect(10, 640, 0, 0));
+        window->GetNativeWindow()->GetHost()->window()->SetName("QuickLaunch");
+        window->Show();
+      }, quick_launch_ui), base::TimeDelta::FromSeconds(10));
+  // windows_.push_back(window);
 }
 
 void QuickLaunch::Create(const service_manager::BindSourceInfo& source_info,

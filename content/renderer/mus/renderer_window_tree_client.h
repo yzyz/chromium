@@ -49,6 +49,8 @@ class RendererWindowTreeClient : public ui::mojom::WindowTreeClient {
 
   ui::mojom::WindowTree* GetWindowTree();
 
+  ui::Id root_window_id();
+
  private:
   explicit RendererWindowTreeClient(int routing_id);
   ~RendererWindowTreeClient() override;

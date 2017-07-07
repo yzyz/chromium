@@ -14,6 +14,7 @@
 #include "services/catalog/public/cpp/resource_loader.h"
 #include "services/catalog/public/interfaces/constants.mojom.h"
 #include "services/service_manager/public/cpp/connector.h"
+#include "services/ui/public/interfaces/window_tree.mojom.h"
 #include "ui/aura/env.h"
 #include "ui/base/ime/input_method_initializer.h"
 #include "ui/base/material_design/material_design_controller.h"
@@ -57,7 +58,8 @@ AuraInit::AuraInit(service_manager::Connector* connector,
                    const std::string& resource_file,
                    const std::string& resource_file_200,
                    scoped_refptr<base::SingleThreadTaskRunner> io_task_runner,
-                   Mode mode)
+                   Mode mode,
+                   ui::mojom::WindowTreeClientRequest request)
     : resource_file_(resource_file),
       resource_file_200_(resource_file_200),
       env_(aura::Env::CreateInstance(
@@ -68,7 +70,10 @@ AuraInit::AuraInit(service_manager::Connector* connector,
     views_delegate_ = base::MakeUnique<MusViewsDelegate>();
   if (mode == Mode::AURA_MUS) {
     mus_client_ =
-        base::WrapUnique(new MusClient(connector, identity, io_task_runner));
+        base::WrapUnique(new MusClient(connector, identity, io_task_runner,
+                                       true /* create_wm_state */,
+                                       MusClientTestingState::NO_TESTING,
+                                       std::move(request)));
   }
   ui::MaterialDesignController::Initialize();
   if (!InitializeResources(connector))
