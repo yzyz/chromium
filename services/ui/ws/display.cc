@@ -122,6 +122,10 @@ WindowManagerDisplayRoot* Display::GetWindowManagerDisplayRootWithRoot(
 
 const WindowManagerDisplayRoot* Display::GetWindowManagerDisplayRootForUser(
     const UserId& user_id) const {
+  // just ignore invalid user ids for now
+  if (user_id == InvalidUserId()) {
+    return window_manager_display_root_map_.begin()->second;
+  }
   auto iter = window_manager_display_root_map_.find(user_id);
   return iter == window_manager_display_root_map_.end() ? nullptr
                                                         : iter->second;

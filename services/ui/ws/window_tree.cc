@@ -1388,8 +1388,13 @@ void WindowTree::NewTopLevelWindow(
       display && user_id_ != InvalidUserId()
           ? display->GetWindowManagerDisplayRootForUser(user_id_)
           : nullptr;
-  if (user_id_ == InvalidUserId())
+
+  // just ignore invalid user ids for now
+  if (user_id_ == InvalidUserId()) {
     LOG(ERROR) << "Invalid user id";
+    display_root = display->GetWindowManagerDisplayRootForUser(user_id_);
+  }
+
   if (!display_root ||
       display_root->window_manager_state()->window_tree() == this ||
       !IsValidIdForNewWindow(client_window_id)) {
