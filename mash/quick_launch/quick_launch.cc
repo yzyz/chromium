@@ -221,6 +221,7 @@ void QuickLaunch::Launch(uint32_t what, mojom::LaunchMode how,
   // initializes the WindowTree that we need to create a window
   base::ThreadTaskRunnerHandle::Get()->PostDelayedTask(
       FROM_HERE, base::Bind([](QuickLaunchUI* quick_launch_ui) {
+        LOG(ERROR) << "CREATING A views::Widget";
         views::Widget* window = views::Widget::CreateWindowWithContextAndBounds(
             quick_launch_ui, nullptr, gfx::Rect(10, 640, 0, 0));
         window->GetNativeWindow()->GetHost()->window()->SetName("QuickLaunch");
