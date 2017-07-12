@@ -72,6 +72,8 @@ class VIEWS_EXPORT DesktopNativeWidgetAura
   void SetDesktopWindowTreeHost(
       std::unique_ptr<DesktopWindowTreeHost> desktop_window_tree_host);
 
+  void SetWindowTreeHost(std::unique_ptr<aura::WindowTreeHost> window_tree_host);
+
   // Called by our DesktopWindowTreeHost after it has deleted native resources;
   // this is the signal that we should start our shutdown.
   virtual void OnHostClosed();
@@ -307,6 +309,8 @@ class VIEWS_EXPORT DesktopNativeWidgetAura
 
   // See DesktopWindowTreeHost::ShouldUseDesktopNativeCursorManager().
   bool use_desktop_native_cursor_manager_ = false;
+
+  bool is_embedded_ = false;
 
   // The following factory is used for calls to close the NativeWidgetAura
   // instance.

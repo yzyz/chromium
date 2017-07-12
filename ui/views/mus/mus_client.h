@@ -176,6 +176,8 @@ class VIEWS_MUS_EXPORT MusClient : public aura::WindowTreeClientDelegate,
 
   ui::mojom::WindowServerTestPtr server_test_ptr_;
 
+  std::unique_ptr<aura::WindowTreeHostMus> window_tree_host_;
+
   DISALLOW_COPY_AND_ASSIGN(MusClient);
 };
 

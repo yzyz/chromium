@@ -237,6 +237,8 @@ NativeWidget* MusClient::CreateNativeWidget(
   if (init_params.desktop_window_tree_host) {
     native_widget->SetDesktopWindowTreeHost(
         base::WrapUnique(init_params.desktop_window_tree_host));
+  } else if (window_tree_host_) {
+    native_widget->SetWindowTreeHost(std::move(window_tree_host_));
   } else {
     native_widget->SetDesktopWindowTreeHost(
         CreateDesktopWindowTreeHost(init_params, delegate, native_widget));
@@ -295,6 +297,7 @@ void MusClient::OnEmbed(
     std::unique_ptr<aura::WindowTreeHostMus> window_tree_host) {
   // can be reached now through mus plugin
   // NOTREACHED();
+  window_tree_host_ = std::move(window_tree_host);
 }
 
 void MusClient::OnLostConnection(aura::WindowTreeClient* client) {}
