@@ -1,7 +1,14 @@
 #include "content/renderer/mus_plugin/mus_plugin.h"
 
+#include <map>
+
 #include "base/bind.h"
-#include "cc/surfaces/local_surface_id_allocator.h"
+#include "base/lazy_instance.h"
+#include "cc/blink/web_layer_impl.h"
+#include "cc/layers/surface_layer.h"
+#include "cc/layers/solid_color_layer.h"
+#include "cc/surfaces/stub_surface_reference_factory.h"
+#include "components/viz/common/surfaces/local_surface_id_allocator.h"
 #include "content/renderer/mus/renderer_window_tree_client.h"
 #include "content/renderer/render_frame_impl.h"
 #include "content/renderer/render_widget.h"
@@ -24,6 +31,50 @@ void EmbedCallback(bool result) {
     LOG(ERROR) << "embed failed";
 }
 
+namespace {
+typedef std::map<ui::Id, MusPlugin*> WindowIdMap;
+base::LazyInstance<WindowIdMap>::Leaky g_window_id_map =
+    LAZY_INSTANCE_INITIALIZER;
+} // namespace
+
+// static
+MusPlugin* MusPlugin::Get(ui::Id window_id) {
+  auto it = g_window_id_map.Get().find(window_id);
+  if (it != g_window_id_map.Get().end())
+    return it->second;
+  return nullptr;
+}
+
+void MusPlugin::SetSurfaceInfo(const viz::SurfaceInfo& surface_info) {
+  LOG(ERROR) << "SetSurfaceInfo";
+  LOG(ERROR) << "id: " << surface_info.id();
+  LOG(ERROR) << "device_scale_factor: " << surface_info.device_scale_factor();
+  LOG(ERROR) << "width: " << surface_info.size_in_pixels().width();
+  LOG(ERROR) << "height: " << surface_info.size_in_pixels().height();
+  LOG(ERROR) << "is valid: " << surface_info.is_valid();
+  scoped_refptr<cc::SurfaceLayer> surface_layer =
+      cc::SurfaceLayer::Create(new cc::StubSurfaceReferenceFactory());
+  surface_layer->SetIsDrawable(true);
+  surface_layer->SetPrimarySurfaceInfo(surface_info);
+  surface_layer->SetFallbackSurfaceInfo(surface_info);
+  surface_layer->SetBounds(surface_info.size_in_pixels());
+  LOG(ERROR) << "layer width: " << surface_layer->bounds().width();
+  LOG(ERROR) << "layer height: " << surface_layer->bounds().height();
+
+  scoped_refptr<cc::SolidColorLayer> solid_color_layer =
+      cc::SolidColorLayer::Create();
+  solid_color_layer->SetBackgroundColor(0xFFFF0000);
+
+  //cc_blink::WebLayerImpl* web_layer = new cc_blink::WebLayerImpl(surface_layer);
+  cc_blink::WebLayerImpl* web_layer =
+      new cc_blink::WebLayerImpl(solid_color_layer);
+  LOG(ERROR) << "weblayer width: " << web_layer->Bounds().width;
+  LOG(ERROR) << "weblayer height: " << web_layer->Bounds().height;
+  LOG(ERROR) << "DrawsContent: " << web_layer->DrawsContent();
+  LOG(ERROR) << "Opacity: " << web_layer->Opacity();
+  container_->SetWebLayer(web_layer);
+}
+
 bool MusPlugin::Initialize(blink::WebPluginContainer* container) {
   LOG(ERROR) << "Initialize";
   container_ = container;
@@ -42,9 +93,10 @@ bool MusPlugin::Initialize(blink::WebPluginContainer* container) {
     return false;
   }
 
+  g_window_id_map.Get().insert(std::make_pair(17, this));
   tree->NewWindow(20, 17, base::nullopt);
   tree->AddWindow(21, client->root_window_id(), 17);
-  cc::LocalSurfaceIdAllocator allocator;
+  viz::LocalSurfaceIdAllocator allocator;
   tree->SetWindowBounds(22, 17, gfx::Rect(10, 20, 0, 0), allocator.GenerateId());
   tree->SetWindowVisibility(23, 17, true);
 
