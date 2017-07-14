@@ -11,6 +11,7 @@
 #include "cc/base/switches.h"
 #include "components/viz/client/client_layer_tree_frame_sink.h"
 #include "components/viz/client/local_surface_id_provider.h"
+#include "content/renderer/mus_plugin/mus_plugin.h"
 
 namespace content {
 
@@ -237,7 +238,9 @@ void RendererWindowTreeClient::OnWindowCursorChanged(ui::Id window_id,
 void RendererWindowTreeClient::OnWindowSurfaceChanged(
     ui::Id window_id,
     const viz::SurfaceInfo& surface_info) {
-  NOTIMPLEMENTED();
+  LOG(ERROR) << "OnWindowSurfaceChanged, window_id = " << window_id;
+  MusPlugin* plugin = MusPlugin::Get(window_id);
+  plugin->SetSurfaceInfo(surface_info);
 }
 
 void RendererWindowTreeClient::OnDragDropStart(

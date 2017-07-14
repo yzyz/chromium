@@ -226,7 +226,7 @@ void QuickLaunch::Launch(uint32_t what, mojom::LaunchMode how,
             quick_launch_ui, nullptr, gfx::Rect(10, 640, 0, 0));
         window->GetNativeWindow()->GetHost()->window()->SetName("QuickLaunch");
         window->Show();
-      }, quick_launch_ui), base::TimeDelta::FromSeconds(10));
+      }, quick_launch_ui), base::TimeDelta::FromSeconds(1));
   // windows_.push_back(window);
 }
 

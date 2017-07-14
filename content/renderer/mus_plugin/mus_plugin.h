@@ -3,10 +3,19 @@
 
 #include "third_party/WebKit/public/web/WebPlugin.h"
 
+#include <map>
+
+#include "components/viz/common/surfaces/surface_info.h"
+#include "services/ui/common/types.h"
+
 namespace content {
 
 class MusPlugin : public blink::WebPlugin {
  public:
+  static MusPlugin* Get(ui::Id window_id);
+
+  void SetSurfaceInfo(const viz::SurfaceInfo& surface_info);
+
   bool Initialize(blink::WebPluginContainer* container) override;
   void Destroy() override;
   blink::WebPluginContainer* Container() const override;
