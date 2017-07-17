@@ -65,7 +65,6 @@ SurfaceLayer::~SurfaceLayer() {
 
 void SurfaceLayer::SetPrimarySurfaceInfo(const viz::SurfaceInfo& surface_info) {
   primary_surface_info_ = surface_info;
-  LOG(ERROR) << "HasDrawableContent: " << HasDrawableContent();
   UpdateDrawsContent(HasDrawableContent());
   SetNeedsCommit();
 }

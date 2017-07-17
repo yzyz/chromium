@@ -238,7 +238,6 @@ void RendererWindowTreeClient::OnWindowCursorChanged(ui::Id window_id,
 void RendererWindowTreeClient::OnWindowSurfaceChanged(
     ui::Id window_id,
     const viz::SurfaceInfo& surface_info) {
-  LOG(ERROR) << "OnWindowSurfaceChanged, window_id = " << window_id;
   MusPlugin* plugin = MusPlugin::Get(window_id);
   plugin->SetSurfaceInfo(surface_info);
 }

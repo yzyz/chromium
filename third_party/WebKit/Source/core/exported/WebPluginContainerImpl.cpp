@@ -304,23 +304,16 @@ void WebPluginContainerImpl::SetWebLayer(WebLayer* layer) {
   if (web_layer_ == layer)
     return;
 
-  LOG(ERROR) << "SET WEB LAYER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
 
-  if (web_layer_) {
+  if (web_layer_)
     GraphicsLayer::UnregisterContentsLayer(web_layer_);
-    LOG(ERROR) << "UnregisterContentsLayer";
-  }
-  if (layer) {
+  if (layer)
     GraphicsLayer::RegisterContentsLayer(layer);
-    LOG(ERROR) << "RegisterContentsLayer";
-  }
 
   web_layer_ = layer;
 
-  if (element_) {
-    LOG(ERROR) << "element_->SetNeedsCompositingUpdate()";
+  if (element_)
     element_->SetNeedsCompositingUpdate();
-  }
 }
 
 void WebPluginContainerImpl::RequestFullscreen() {
