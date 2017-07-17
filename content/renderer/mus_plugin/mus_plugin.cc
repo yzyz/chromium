@@ -6,7 +6,6 @@
 #include "base/lazy_instance.h"
 #include "cc/blink/web_layer_impl.h"
 #include "cc/layers/surface_layer.h"
-#include "cc/layers/solid_color_layer.h"
 #include "cc/surfaces/stub_surface_reference_factory.h"
 #include "components/viz/common/surfaces/local_surface_id_allocator.h"
 #include "content/renderer/mus/renderer_window_tree_client.h"
@@ -54,24 +53,13 @@ void MusPlugin::SetSurfaceInfo(const viz::SurfaceInfo& surface_info) {
   LOG(ERROR) << "is valid: " << surface_info.is_valid();
   scoped_refptr<cc::SurfaceLayer> surface_layer =
       cc::SurfaceLayer::Create(new cc::StubSurfaceReferenceFactory());
-  surface_layer->SetIsDrawable(true);
   surface_layer->SetPrimarySurfaceInfo(surface_info);
-  surface_layer->SetFallbackSurfaceInfo(surface_info);
-  surface_layer->SetBounds(surface_info.size_in_pixels());
   LOG(ERROR) << "layer width: " << surface_layer->bounds().width();
   LOG(ERROR) << "layer height: " << surface_layer->bounds().height();
 
-  scoped_refptr<cc::SolidColorLayer> solid_color_layer =
-      cc::SolidColorLayer::Create();
-  solid_color_layer->SetBackgroundColor(0xFFFF0000);
-
-  //cc_blink::WebLayerImpl* web_layer = new cc_blink::WebLayerImpl(surface_layer);
-  cc_blink::WebLayerImpl* web_layer =
-      new cc_blink::WebLayerImpl(solid_color_layer);
+  cc_blink::WebLayerImpl* web_layer = new cc_blink::WebLayerImpl(surface_layer);
   LOG(ERROR) << "weblayer width: " << web_layer->Bounds().width;
   LOG(ERROR) << "weblayer height: " << web_layer->Bounds().height;
-  LOG(ERROR) << "DrawsContent: " << web_layer->DrawsContent();
-  LOG(ERROR) << "Opacity: " << web_layer->Opacity();
   container_->SetWebLayer(web_layer);
 }
 
@@ -97,7 +85,7 @@ bool MusPlugin::Initialize(blink::WebPluginContainer* container) {
   tree->NewWindow(20, 17, base::nullopt);
   tree->AddWindow(21, client->root_window_id(), 17);
   viz::LocalSurfaceIdAllocator allocator;
-  tree->SetWindowBounds(22, 17, gfx::Rect(10, 20, 0, 0), allocator.GenerateId());
+  tree->SetWindowBounds(22, 17, gfx::Rect(500, 100), allocator.GenerateId());
   tree->SetWindowVisibility(23, 17, true);
 
   mojom::MusPluginWindowTreeClientFactoryPtr factory;
