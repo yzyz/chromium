@@ -490,6 +490,8 @@ void DesktopNativeWidgetAura::InitNativeWidget(
 
   if (!is_embedded_)
     desktop_window_tree_host_->OnNativeWidgetCreated(params);
+  else
+    native_widget_delegate_->OnNativeWidgetCreated(true);
 
   UpdateWindowTransparency();
 

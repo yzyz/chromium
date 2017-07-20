@@ -100,9 +100,7 @@ bool MusPlugin::Initialize(blink::WebPluginContainer* container) {
   ui::mojom::WindowTreeClientPtr window_tree_client;
   factory->CreateWindowTreeClientForMusPlugin(
       routing_id, mojo::MakeRequest(&window_tree_client));
-  tree->Embed(17, std::move(window_tree_client),
-              ui::mojom::kEmbedFlagEmbedderInterceptsEvents,
-              base::Bind(&EmbedCallback));
+  tree->Embed(17, std::move(window_tree_client), 0, base::Bind(&EmbedCallback));
   return true;
 }
 
