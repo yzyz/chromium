@@ -507,6 +507,7 @@ std::string Widget::GetWorkspace() const {
 }
 
 void Widget::SetBounds(const gfx::Rect& bounds) {
+  LOG(ERROR) << "SetBounds: " << bounds.width() << " x " << bounds.height();
   native_widget_->SetBounds(bounds);
 }
 
@@ -1474,6 +1475,7 @@ void Widget::SaveWindowPlacementIfInitialized() {
 }
 
 void Widget::SetInitialBounds(const gfx::Rect& bounds) {
+  LOG(ERROR) << "SetInitialBounds: " << bounds.width() << " x " << bounds.height();
   if (!non_client_view_)
     return;
 

@@ -512,6 +512,9 @@ std::unique_ptr<WindowTreeHostMus> WindowTreeClient::CreateWindowTreeHost(
   ui::Compositor* compositor =
       window_tree_host->window()->GetHost()->compositor();
   compositor->AddObserver(this);
+  LOG(ERROR) << "created window tree host";
+  LOG(ERROR) << "width: " << window_tree_host->GetBoundsInPixels().width();
+  LOG(ERROR) << "height: " << window_tree_host->GetBoundsInPixels().height();
   return window_tree_host;
 }
 
@@ -668,7 +671,11 @@ void WindowTreeClient::SetWindowBoundsFromServer(
     WindowMus* window,
     const gfx::Rect& revert_bounds_in_pixels,
     const base::Optional<viz::LocalSurfaceId>& local_surface_id) {
+  LOG(ERROR) << "SetWindowBoundsFromServer: "
+             << revert_bounds_in_pixels.width() << " x "
+             << revert_bounds_in_pixels.height();
   if (IsRoot(window)) {
+    LOG(ERROR) << "window is root";
     // WindowTreeHost expects bounds to be in pixels.
     GetWindowTreeHostMus(window)->SetBoundsFromServer(revert_bounds_in_pixels);
     if (local_surface_id && local_surface_id->is_valid()) {
@@ -678,6 +685,7 @@ void WindowTreeClient::SetWindowBoundsFromServer(
     return;
   }
 
+  LOG(ERROR) << "window is not root";
   window->SetBoundsFromServer(
       gfx::ConvertRectToDIP(ScaleFactorForDisplay(window->GetWindow()),
                             revert_bounds_in_pixels),

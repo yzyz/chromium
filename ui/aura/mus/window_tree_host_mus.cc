@@ -108,6 +108,7 @@ WindowTreeHostMus* WindowTreeHostMus::ForWindow(aura::Window* window) {
 }
 
 void WindowTreeHostMus::SetBoundsFromServer(const gfx::Rect& bounds_in_pixels) {
+  LOG(ERROR) << "SetBoundsFromServer";
   base::AutoReset<bool> resetter(&in_set_bounds_from_server_, true);
   SetBoundsInPixels(bounds_in_pixels);
 }
@@ -115,27 +116,33 @@ void WindowTreeHostMus::SetBoundsFromServer(const gfx::Rect& bounds_in_pixels) {
 void WindowTreeHostMus::SetClientArea(
     const gfx::Insets& insets,
     const std::vector<gfx::Rect>& additional_client_area) {
+  LOG(ERROR) << "SetClientArea";
   delegate_->OnWindowTreeHostClientAreaWillChange(this, insets,
                                                   additional_client_area);
 }
 
 void WindowTreeHostMus::SetHitTestMask(const base::Optional<gfx::Rect>& rect) {
+  LOG(ERROR) << "SetHitTestMask";
   delegate_->OnWindowTreeHostHitTestMaskWillChange(this, rect);
 }
 
 void WindowTreeHostMus::SetOpacity(float value) {
+  LOG(ERROR) << "SetOpacity";
   delegate_->OnWindowTreeHostSetOpacity(this, value);
 }
 
 void WindowTreeHostMus::DeactivateWindow() {
+  LOG(ERROR) << "DeactivateWindow";
   delegate_->OnWindowTreeHostDeactivateWindow(this);
 }
 
 void WindowTreeHostMus::StackAbove(Window* window) {
+  LOG(ERROR) << "StackAbove";
   delegate_->OnWindowTreeHostStackAbove(this, window);
 }
 
 void WindowTreeHostMus::StackAtTop() {
+  LOG(ERROR) << "StackAtTop";
   delegate_->OnWindowTreeHostStackAtTop(this);
 }
 
@@ -143,11 +150,13 @@ void WindowTreeHostMus::PerformWindowMove(
     ui::mojom::MoveLoopSource mus_source,
     const gfx::Point& cursor_location,
     const base::Callback<void(bool)>& callback) {
+  LOG(ERROR) << "PerformWindowMove";
   delegate_->OnWindowTreeHostPerformWindowMove(
       this, mus_source, cursor_location, callback);
 }
 
 void WindowTreeHostMus::CancelWindowMove() {
+  LOG(ERROR) << "CancelWindowMove";
   delegate_->OnWindowTreeHostCancelWindowMove(this);
 }
 
@@ -158,6 +167,7 @@ void WindowTreeHostMus::ConfineCursorToBounds(
 }
 
 display::Display WindowTreeHostMus::GetDisplay() const {
+  LOG(ERROR) << "GetDisplay";
   display::Display display;
   display::Screen::GetScreen()->GetDisplayWithDisplayId(display_id_, &display);
   return display;
@@ -165,29 +175,38 @@ display::Display WindowTreeHostMus::GetDisplay() const {
 
 std::unique_ptr<DisplayInitParams>
 WindowTreeHostMus::ReleaseDisplayInitParams() {
+  LOG(ERROR) << "ReleaseDisplayInitParams";
   return std::move(display_init_params_);
 }
 
 void WindowTreeHostMus::HideImpl() {
+  LOG(ERROR) << "HideImpl";
   WindowTreeHostPlatform::HideImpl();
   window()->Hide();
 }
 
 void WindowTreeHostMus::SetBoundsInPixels(const gfx::Rect& bounds) {
+  LOG(ERROR) << "SetBoundsInPixels: " << bounds.width() << ' ' << bounds.height();
+  LOG(ERROR) << "current: " << GetBoundsInPixels().width() << ' '
+             << GetBoundsInPixels().height();
+  LOG(ERROR) << "display_id: " << display_id_;
   if (!in_set_bounds_from_server_)
     delegate_->OnWindowTreeHostBoundsWillChange(this, bounds);
   WindowTreeHostPlatform::SetBoundsInPixels(bounds);
 }
 
 void WindowTreeHostMus::DispatchEvent(ui::Event* event) {
+  LOG(ERROR) << "DispatchEvent";
   DCHECK(!event->IsKeyEvent());
   WindowTreeHostPlatform::DispatchEvent(event);
 }
 
 void WindowTreeHostMus::OnClosed() {
+  LOG(ERROR) << "OnClosed";
 }
 
 void WindowTreeHostMus::OnActivationChanged(bool active) {
+  LOG(ERROR) << "OnActivationChanged";
   if (active)
     GetInputMethod()->OnFocus();
   else
@@ -196,11 +215,13 @@ void WindowTreeHostMus::OnActivationChanged(bool active) {
 }
 
 void WindowTreeHostMus::OnCloseRequest() {
+  LOG(ERROR) << "OnCloseRequest";
   OnHostCloseRequested();
 }
 
 void WindowTreeHostMus::MoveCursorToScreenLocationInPixels(
     const gfx::Point& location_in_pixels) {
+  LOG(ERROR) << "MoveCursorToScreenLocationInPixels";
   gfx::Point screen_location_in_pixels = location_in_pixels;
   gfx::Point location = GetLocationOnScreenInPixels();
   screen_location_in_pixels.Offset(-location.x(), -location.y());

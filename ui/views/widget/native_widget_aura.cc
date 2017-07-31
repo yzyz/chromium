@@ -40,6 +40,7 @@
 #include "ui/gfx/font_list.h"
 #include "ui/native_theme/native_theme_aura.h"
 #include "ui/views/drag_utils.h"
+#include "ui/views/mus/mus_focus_rules.h"
 #include "ui/views/views_delegate.h"
 #include "ui/views/widget/drop_helper.h"
 #include "ui/views/widget/focus_manager_event_handler.h"
@@ -49,6 +50,7 @@
 #include "ui/views/widget/widget_aura_utils.h"
 #include "ui/views/widget/widget_delegate.h"
 #include "ui/views/widget/window_reorderer.h"
+#include "ui/wm/core/focus_controller.h"
 #include "ui/wm/core/shadow_types.h"
 #include "ui/wm/core/transient_window_manager.h"
 #include "ui/wm/core/window_animations.h"
@@ -147,10 +149,49 @@ void NativeWidgetAura::SetShadowElevationFromInitParams(
 ////////////////////////////////////////////////////////////////////////////////
 // NativeWidgetAura, internal::NativeWidgetPrivate implementation:
 
+void NativeWidgetAura::InitNativeWidget2(
+    const Widget::InitParams& params) {
+  ownership_ = params.ownership;
+  gfx::NativeView parent = params.parent ? params.parent : parent_;
+  if (!parent) parent = params.context->GetRootWindow();
+
+  NativeWidgetAura::RegisterNativeWidgetForWindow(this, window_);
+  window_->SetType(GetAuraWindowTypeForWidgetType(params.type));
+  window_->Init(params.layer_type);
+  wm::SetShadowElevation(window_, wm::ShadowElevation::NONE);
+
+  parent->AddChild(window_);
+
+  delegate_->OnNativeWidgetCreated(true);
+
+  wm::FocusController* focus_controller =
+      new wm::FocusController(new MusFocusRules());
+  aura::client::SetFocusClient(parent, focus_controller);
+  wm::SetActivationClient(parent, focus_controller);
+
+  wm::SetActivationDelegate(window_, this);
+  gfx::Rect new_bounds = gfx::Rect(parent->bounds().size());
+  window_->SetBounds(new_bounds);
+  delegate_->OnNativeWidgetSizeChanged(new_bounds.size());
+
+  if (params.type == Widget::InitParams::TYPE_WINDOW) {
+    focus_manager_event_handler_ = base::MakeUnique<FocusManagerEventHandler>(
+        GetWidget(), parent);
+  }
+
+  window_reorderer_.reset(new WindowReorderer(window_,
+      GetWidget()->GetRootView()));
+}
+
+
 void NativeWidgetAura::InitNativeWidget(const Widget::InitParams& params) {
   // Aura needs to know which desktop (Ash or regular) will manage this widget.
   // See Widget::InitParams::context for details.
-  DCHECK(params.parent || params.context);
+  DCHECK(params.parent || params.context || parent_);
+  if (parent_) {
+    InitNativeWidget2(params);
+    return;
+  }
 
   ownership_ = params.ownership;
 
@@ -173,7 +214,7 @@ void NativeWidgetAura::InitNativeWidget(const Widget::InitParams& params) {
   delegate_->OnNativeWidgetCreated(false);
 
   gfx::Rect window_bounds = params.bounds;
-  gfx::NativeView parent = params.parent;
+  gfx::NativeView parent = params.parent ? params.parent : parent_;
   gfx::NativeView context = params.context;
   if (!params.child) {
     // Set up the transient child before the window is added. This way the
@@ -211,6 +252,8 @@ void NativeWidgetAura::InitNativeWidget(const Widget::InitParams& params) {
   OnSizeConstraintsChanged();
 
   if (parent) {
+    LOG(ERROR) << "ADD CHILD: " << parent->GetName() << " : "
+               << window_->GetName();
     parent->AddChild(window_);
   } else {
     aura::client::ParentWindowWithContext(
@@ -239,6 +282,12 @@ void NativeWidgetAura::InitNativeWidget(const Widget::InitParams& params) {
   if (params.type != Widget::InitParams::TYPE_TOOLTIP &&
       params.type != Widget::InitParams::TYPE_POPUP) {
     aura::client::SetDragDropDelegate(window_, this);
+  }
+
+  if (parent_) {
+    gfx::Rect new_bounds = gfx::Rect(parent_->bounds().size());
+    window_->SetBounds(new_bounds);
+    delegate_->OnNativeWidgetSizeChanged(new_bounds.size());
   }
 
   if (params.type == Widget::InitParams::TYPE_WINDOW) {
@@ -461,6 +510,16 @@ std::string NativeWidgetAura::GetWorkspace() const {
 }
 
 void NativeWidgetAura::SetBounds(const gfx::Rect& bounds) {
+  LOG(ERROR) << "NativeWidgetAura::SetBounds "
+             << bounds.width() << " x " << bounds.height();
+  if (parent_) {
+    display::Screen* screen = display::Screen::GetScreen();
+    gfx::Rect bounds_in_pixels =
+        screen->DIPToScreenRectInWindow(parent_, bounds);
+    window_tree_host_->SetBoundsInPixels(bounds_in_pixels);
+    return;
+  }
+
   if (!window_)
     return;
 
@@ -545,6 +604,7 @@ void NativeWidgetAura::ShowWithWindowState(ui::WindowShowState state) {
     window_->SetProperty(aura::client::kShowStateKey, state);
   window_->Show();
   if (delegate_->CanActivate()) {
+    LOG(ERROR) << "can activate";
     if (state != ui::SHOW_STATE_INACTIVE)
       Activate();
     // SetInitialFocus() should be always be called, even for
