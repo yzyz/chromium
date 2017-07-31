@@ -275,6 +275,7 @@ void WindowTreeHost::CreateCompositor(const viz::FrameSinkId& frame_sink_id) {
 }
 
 void WindowTreeHost::InitCompositor() {
+  LOG(ERROR) << "InitCompositor";
   display::Display display =
       display::Screen::GetScreen()->GetDisplayNearestWindow(window());
   compositor_->SetScaleAndSize(display.device_scale_factor(),
@@ -300,6 +301,9 @@ void WindowTreeHost::OnHostMovedInPixels(
 
 void WindowTreeHost::OnHostResizedInPixels(
     const gfx::Size& new_size_in_pixels) {
+  LOG(ERROR) << "OnHostResizedInPixels: "
+             << new_size_in_pixels.width() << " x "
+             << new_size_in_pixels.height();
   gfx::Size adjusted_size(new_size_in_pixels);
   adjusted_size.Enlarge(output_surface_padding_in_pixels_.width(),
                         output_surface_padding_in_pixels_.height());

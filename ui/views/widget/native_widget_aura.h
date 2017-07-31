@@ -13,6 +13,7 @@
 #include "ui/aura/client/focus_change_observer.h"
 #include "ui/aura/window_delegate.h"
 #include "ui/aura/window_observer.h"
+#include "ui/aura/window_tree_host.h"
 #include "ui/base/cursor/cursor.h"
 #include "ui/events/event_constants.h"
 #include "ui/views/views_export.h"
@@ -61,8 +62,14 @@ class VIEWS_EXPORT NativeWidgetAura : public internal::NativeWidgetPrivate,
       aura::Window* window,
       const Widget::InitParams& params);
 
+  void SetParent(gfx::NativeView parent) { parent_ = parent; }
+  void SetWindowTreeHost(aura::WindowTreeHost* window_tree_host) {
+    window_tree_host_ = window_tree_host;
+  }
+
   // Overridden from internal::NativeWidgetPrivate:
   void InitNativeWidget(const Widget::InitParams& params) override;
+  void InitNativeWidget2(const Widget::InitParams& params);
   void OnWidgetInitDone() override;
   NonClientFrameView* CreateNonClientFrameView() override;
   bool ShouldUseNativeFrame() const override;
@@ -234,6 +241,10 @@ class VIEWS_EXPORT NativeWidgetAura : public internal::NativeWidgetPrivate,
 
   // Native widget's handler to receive events before the event target.
   std::unique_ptr<FocusManagerEventHandler> focus_manager_event_handler_;
+
+  gfx::NativeView parent_;
+
+  aura::WindowTreeHost* window_tree_host_;
 
   // The following factory is used for calls to close the NativeWidgetAura
   // instance.

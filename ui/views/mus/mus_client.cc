@@ -27,12 +27,15 @@
 #include "ui/views/mus/aura_init.h"
 #include "ui/views/mus/clipboard_mus.h"
 #include "ui/views/mus/desktop_window_tree_host_mus.h"
+#include "ui/views/mus/mus_focus_rules.h"
 #include "ui/views/mus/mus_property_mirror.h"
 #include "ui/views/mus/pointer_watcher_event_router.h"
 #include "ui/views/mus/screen_mus.h"
 #include "ui/views/views_delegate.h"
 #include "ui/views/widget/desktop_aura/desktop_native_widget_aura.h"
+#include "ui/views/widget/native_widget_aura.h"
 #include "ui/views/widget/widget_delegate.h"
+#include "ui/wm/core/focus_controller.h"
 #include "ui/wm/core/shadow_types.h"
 #include "ui/wm/core/wm_state.h"
 
@@ -232,13 +235,33 @@ NativeWidget* MusClient::CreateNativeWidget(
     return nullptr;
   }
 
+  if (window_tree_host_) {
+    /*
+    DesktopNativeWidgetAura* native_widget =
+        new DesktopNativeWidgetAura(delegate);
+    native_widget->SetWindowTreeHost(std::move(window_tree_host_));
+    */
+    NativeWidgetAura* native_widget = new NativeWidgetAura(delegate);
+    aura::Window* window = window_tree_host_->window();
+    native_widget->SetParent(window);
+    native_widget->SetWindowTreeHost(window_tree_host_.get());
+    //wm::FocusController* focus_controller =
+    //    new wm::FocusController(new MusFocusRules());
+    //aura::client::SetFocusClient(window, focus_controller);
+    //wm::SetActivationClient(window, focus_controller);
+    window_tree_host_->InitHost();
+    window_tree_host_->Show();
+    LOG(ERROR) << "window_tree_host_ bounds: "
+               << window_tree_host_->GetBoundsInPixels().width() << " x "
+               << window_tree_host_->GetBoundsInPixels().height();
+    return native_widget;
+  }
+
   DesktopNativeWidgetAura* native_widget =
       new DesktopNativeWidgetAura(delegate);
   if (init_params.desktop_window_tree_host) {
     native_widget->SetDesktopWindowTreeHost(
         base::WrapUnique(init_params.desktop_window_tree_host));
-  } else if (window_tree_host_) {
-    native_widget->SetWindowTreeHost(std::move(window_tree_host_));
   } else {
     native_widget->SetDesktopWindowTreeHost(
         CreateDesktopWindowTreeHost(init_params, delegate, native_widget));
