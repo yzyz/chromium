@@ -312,8 +312,6 @@ void Compositor::SetLatencyInfo(const ui::LatencyInfo& latency_info) {
 }
 
 void Compositor::SetScaleAndSize(float scale, const gfx::Size& size_in_pixel) {
-  LOG(ERROR) << "SetScaleAndSize: " << scale << ", " <<
-             size_in_pixel.width() << " x " << size_in_pixel.height();
   DCHECK_GT(scale, 0);
   if (!size_in_pixel.IsEmpty()) {
     size_ = size_in_pixel;
@@ -354,7 +352,6 @@ void Compositor::SetBackgroundColor(SkColor color) {
 }
 
 void Compositor::SetVisible(bool visible) {
-  LOG(ERROR) << "SetVisible";
   host_->SetVisible(visible);
   // Visibility is reset when the output surface is lost, so this must also be
   // updated then.
@@ -463,10 +460,6 @@ bool Compositor::HasAnimationObserver(
 }
 
 void Compositor::BeginMainFrame(const cc::BeginFrameArgs& args) {
-  LOG(ERROR) << "BeginMainFrame";
-  LOG(ERROR) << "Is visible: " << IsVisible();
-  LOG(ERROR) << "device_scale_factor: " << device_scale_factor_;
-  LOG(ERROR) << "size: " << size_.width() << " x " << size_.height();
   DCHECK(!IsLocked());
   for (auto& observer : animation_observer_list_)
     observer.OnAnimationStep(args.frame_time);
