@@ -245,10 +245,10 @@ NativeWidget* MusClient::CreateNativeWidget(
     aura::Window* window = window_tree_host_->window();
     native_widget->SetParent(window);
     native_widget->SetWindowTreeHost(window_tree_host_.get());
-    //wm::FocusController* focus_controller =
-    //    new wm::FocusController(new MusFocusRules());
-    //aura::client::SetFocusClient(window, focus_controller);
-    //wm::SetActivationClient(window, focus_controller);
+    wm::FocusController* focus_controller =
+        new wm::FocusController(new MusFocusRules());
+    aura::client::SetFocusClient(window, focus_controller);
+    wm::SetActivationClient(window, focus_controller);
     window_tree_host_->InitHost();
     window_tree_host_->Show();
     LOG(ERROR) << "window_tree_host_ bounds: "

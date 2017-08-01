@@ -39,7 +39,6 @@
 #include "ui/gfx/font_list.h"
 #include "ui/native_theme/native_theme_aura.h"
 #include "ui/views/drag_utils.h"
-#include "ui/views/mus/mus_focus_rules.h"
 #include "ui/views/views_delegate.h"
 #include "ui/views/widget/drop_helper.h"
 #include "ui/views/widget/focus_manager_event_handler.h"
@@ -49,7 +48,6 @@
 #include "ui/views/widget/widget_aura_utils.h"
 #include "ui/views/widget/widget_delegate.h"
 #include "ui/views/widget/window_reorderer.h"
-#include "ui/wm/core/focus_controller.h"
 #include "ui/wm/core/shadow_types.h"
 #include "ui/wm/core/transient_window_manager.h"
 #include "ui/wm/core/window_animations.h"
@@ -148,49 +146,10 @@ void NativeWidgetAura::SetShadowElevationFromInitParams(
 ////////////////////////////////////////////////////////////////////////////////
 // NativeWidgetAura, internal::NativeWidgetPrivate implementation:
 
-void NativeWidgetAura::InitNativeWidget2(
-    const Widget::InitParams& params) {
-  ownership_ = params.ownership;
-  gfx::NativeView parent = params.parent ? params.parent : parent_;
-  if (!parent) parent = params.context->GetRootWindow();
-
-  NativeWidgetAura::RegisterNativeWidgetForWindow(this, window_);
-  window_->SetType(GetAuraWindowTypeForWidgetType(params.type));
-  window_->Init(params.layer_type);
-  wm::SetShadowElevation(window_, wm::ShadowElevation::NONE);
-
-  parent->AddChild(window_);
-
-  delegate_->OnNativeWidgetCreated(true);
-
-  wm::FocusController* focus_controller =
-      new wm::FocusController(new MusFocusRules());
-  aura::client::SetFocusClient(parent, focus_controller);
-  wm::SetActivationClient(parent, focus_controller);
-
-  wm::SetActivationDelegate(window_, this);
-  gfx::Rect new_bounds = gfx::Rect(parent->bounds().size());
-  window_->SetBounds(new_bounds);
-  delegate_->OnNativeWidgetSizeChanged(new_bounds.size());
-
-  if (params.type == Widget::InitParams::TYPE_WINDOW) {
-    focus_manager_event_handler_ = base::MakeUnique<FocusManagerEventHandler>(
-        GetWidget(), parent);
-  }
-
-  window_reorderer_.reset(new WindowReorderer(window_,
-      GetWidget()->GetRootView()));
-}
-
-
 void NativeWidgetAura::InitNativeWidget(const Widget::InitParams& params) {
   // Aura needs to know which desktop (Ash or regular) will manage this widget.
   // See Widget::InitParams::context for details.
   DCHECK(params.parent || params.context || parent_);
-  if (parent_) {
-    InitNativeWidget2(params);
-    return;
-  }
 
   ownership_ = params.ownership;
 
@@ -263,10 +222,17 @@ void NativeWidgetAura::InitNativeWidget(const Widget::InitParams& params) {
   // Wait to set the bounds until we have a parent. That way we can know our
   // true state/bounds (the LayoutManager may enforce a particular
   // state/bounds).
-  if (IsMaximized())
-    SetRestoreBounds(window_, window_bounds);
-  else
-    SetBounds(window_bounds);
+  if (!parent_) {
+    if (IsMaximized())
+      SetRestoreBounds(window_, window_bounds);
+    else
+      SetBounds(window_bounds);
+  } else {
+    gfx::Rect new_bounds = gfx::Rect(parent_->bounds().size());
+    window_->SetBounds(new_bounds);
+    delegate_->OnNativeWidgetSizeChanged(new_bounds.size());
+  }
+
   window_->set_ignore_events(!params.accept_events);
   DCHECK(GetWidget()->GetRootView());
   if (params.type != Widget::InitParams::TYPE_TOOLTIP)
@@ -276,12 +242,6 @@ void NativeWidgetAura::InitNativeWidget(const Widget::InitParams& params) {
   if (params.type != Widget::InitParams::TYPE_TOOLTIP &&
       params.type != Widget::InitParams::TYPE_POPUP) {
     aura::client::SetDragDropDelegate(window_, this);
-  }
-
-  if (parent_) {
-    gfx::Rect new_bounds = gfx::Rect(parent_->bounds().size());
-    window_->SetBounds(new_bounds);
-    delegate_->OnNativeWidgetSizeChanged(new_bounds.size());
   }
 
   if (params.type == Widget::InitParams::TYPE_WINDOW) {
