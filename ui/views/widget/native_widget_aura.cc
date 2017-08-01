@@ -252,8 +252,6 @@ void NativeWidgetAura::InitNativeWidget(const Widget::InitParams& params) {
   OnSizeConstraintsChanged();
 
   if (parent) {
-    LOG(ERROR) << "ADD CHILD: " << parent->GetName() << " : "
-               << window_->GetName();
     parent->AddChild(window_);
   } else {
     aura::client::ParentWindowWithContext(
@@ -510,8 +508,6 @@ std::string NativeWidgetAura::GetWorkspace() const {
 }
 
 void NativeWidgetAura::SetBounds(const gfx::Rect& bounds) {
-  LOG(ERROR) << "NativeWidgetAura::SetBounds "
-             << bounds.width() << " x " << bounds.height();
   if (parent_) {
     display::Screen* screen = display::Screen::GetScreen();
     gfx::Rect bounds_in_pixels =
@@ -604,7 +600,6 @@ void NativeWidgetAura::ShowWithWindowState(ui::WindowShowState state) {
     window_->SetProperty(aura::client::kShowStateKey, state);
   window_->Show();
   if (delegate_->CanActivate()) {
-    LOG(ERROR) << "can activate";
     if (state != ui::SHOW_STATE_INACTIVE)
       Activate();
     // SetInitialFocus() should be always be called, even for

@@ -1697,7 +1697,6 @@ CompositorFrameMetadata LayerTreeHostImpl::MakeCompositorFrameMetadata() const {
 }
 
 bool LayerTreeHostImpl::DrawLayers(FrameData* frame) {
-  //LOG(ERROR) << "DrawLayers";
   DCHECK(CanDraw());
   DCHECK_EQ(frame->has_no_damage, frame->render_passes.empty());
 
@@ -1706,7 +1705,6 @@ bool LayerTreeHostImpl::DrawLayers(FrameData* frame) {
   ResetRequiresHighResToDraw();
 
   if (frame->has_no_damage) {
-    //LOG(ERROR) << "has no damage";
     DCHECK(!resourceless_software_draw_);
 
     TRACE_EVENT_INSTANT0("cc", "EarlyOut_NoDamage", TRACE_EVENT_SCOPE_THREAD);

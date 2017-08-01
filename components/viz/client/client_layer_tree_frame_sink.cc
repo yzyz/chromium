@@ -111,7 +111,6 @@ void ClientLayerTreeFrameSink::SetLocalSurfaceId(
 
 void ClientLayerTreeFrameSink::SubmitCompositorFrame(
     cc::CompositorFrame frame) {
-  //LOG(ERROR) << "SubmitCompositorFrame";
   DCHECK_CALLED_ON_VALID_THREAD(thread_checker_);
   DCHECK(frame.metadata.begin_frame_ack.has_damage);
   DCHECK_LE(BeginFrameArgs::kStartingFrameNumber,
@@ -160,7 +159,6 @@ void ClientLayerTreeFrameSink::ReclaimResources(
 }
 
 void ClientLayerTreeFrameSink::OnNeedsBeginFrames(bool needs_begin_frames) {
-  //LOG(ERROR) << "OnNeedsBeginFrames: " << needs_begin_frames;
   compositor_frame_sink_->SetNeedsBeginFrame(needs_begin_frames);
 }
 
