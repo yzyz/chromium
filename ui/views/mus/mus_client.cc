@@ -249,8 +249,8 @@ NativeWidget* MusClient::CreateNativeWidget(
         new wm::FocusController(new MusFocusRules());
     aura::client::SetFocusClient(window, focus_controller);
     wm::SetActivationClient(window, focus_controller);
-    window_tree_host_->InitHost();
-    window_tree_host_->Show();
+    //window_tree_host_->InitHost();
+    //window_tree_host_->Show();
     LOG(ERROR) << "window_tree_host_ bounds: "
                << window_tree_host_->GetBoundsInPixels().width() << " x "
                << window_tree_host_->GetBoundsInPixels().height();

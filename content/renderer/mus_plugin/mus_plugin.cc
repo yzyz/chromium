@@ -101,6 +101,7 @@ bool MusPlugin::Initialize(blink::WebPluginContainer* container) {
   factory->CreateWindowTreeClientForMusPlugin(
       routing_id, mojo::MakeRequest(&window_tree_client));
   tree->Embed(17, std::move(window_tree_client), 0, base::Bind(&EmbedCallback));
+
   return true;
 }
 
@@ -125,6 +126,16 @@ void MusPlugin::UpdateGeometry(const blink::WebRect& window_rect,
                     const blink::WebRect& unobscured_rect,
                     bool is_visible) {
   LOG(ERROR) << "UpdateGeometry";
+  blink::WebDocument document = container_->GetDocument();
+  blink::WebFrame* web_frame = document.GetFrame();
+  RenderFrameImpl* render_frame = RenderFrameImpl::FromWebFrame(web_frame);
+  RenderWidget* render_widget = render_frame->GetRenderWidget();
+  int routing_id = render_widget->routing_id();
+
+  RendererWindowTreeClient* client = RendererWindowTreeClient::Get(routing_id);
+  ui::mojom::WindowTree* tree = client->GetWindowTree();
+  viz::LocalSurfaceIdAllocator allocator;
+  tree->SetWindowBounds(24, 17, window_rect, allocator.GenerateId());
 }
 
 void MusPlugin::UpdateFocus(bool focused, blink::WebFocusType focus_type) {
