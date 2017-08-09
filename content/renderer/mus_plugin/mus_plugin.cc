@@ -6,7 +6,7 @@
 #include "base/lazy_instance.h"
 #include "cc/blink/web_layer_impl.h"
 #include "cc/layers/surface_layer.h"
-#include "cc/surfaces/stub_surface_reference_factory.h"
+#include "components/viz/common/surfaces/stub_surface_reference_factory.h"
 #include "components/viz/common/surfaces/local_surface_id_allocator.h"
 #include "content/renderer/mus/renderer_window_tree_client.h"
 #include "content/renderer/render_frame_impl.h"
@@ -52,7 +52,7 @@ void MusPlugin::SetSurfaceInfo(const viz::SurfaceInfo& surface_info) {
   LOG(ERROR) << "height: " << surface_info.size_in_pixels().height();
   LOG(ERROR) << "is valid: " << surface_info.is_valid();
   scoped_refptr<cc::SurfaceLayer> surface_layer =
-      cc::SurfaceLayer::Create(new cc::StubSurfaceReferenceFactory());
+      cc::SurfaceLayer::Create(new viz::StubSurfaceReferenceFactory());
   surface_layer->SetPrimarySurfaceInfo(surface_info);
   LOG(ERROR) << "layer width: " << surface_layer->bounds().width();
   LOG(ERROR) << "layer height: " << surface_layer->bounds().height();

@@ -693,7 +693,6 @@ void CreateResourceCoordinatorProcessInterface(
 
 void CreateMusPluginWindowTreeClientFactory(
     int render_process_id,
-    const service_manager::BindSourceInfo& source_info,
     mojom::MusPluginWindowTreeClientFactoryRequest request) {
   MusPluginWindowTreeClientFactoryImpl::CreateNewFactory(std::move(request));
 }

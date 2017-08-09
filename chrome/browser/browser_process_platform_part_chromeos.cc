@@ -90,7 +90,8 @@ class ChromeServiceChromeOS : public service_manager::Service,
   }
 
   // mash::mojom::Launchable:
-  void Launch(uint32_t what, mash::mojom::LaunchMode how) override {
+  void Launch(uint32_t what, mash::mojom::LaunchMode how,
+              ui::mojom::WindowTreeClientRequest client) override {
     bool is_incognito;
     switch (what) {
       case mash::mojom::kWindow:
