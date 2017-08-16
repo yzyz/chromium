@@ -110,6 +110,7 @@ NativeWidgetAura::NativeWidgetAura(internal::NativeWidgetDelegate* delegate,
       ownership_(Widget::InitParams::NATIVE_WIDGET_OWNS_WIDGET),
       destroying_(false),
       cursor_(gfx::kNullCursor),
+      parent_(nullptr),
       close_widget_factory_(this) {
   aura::client::SetFocusChangeObserver(window_, this);
   wm::SetActivationChangeObserver(window_, this);
